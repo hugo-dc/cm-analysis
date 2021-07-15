@@ -1,4 +1,5 @@
 #!/bin/env python
+import html
 
 code_hash = '0a84592dd9d53a4f475125d8a8bc9e6bd21da004081852646b6e74191f5a4aa0'
 
@@ -33,20 +34,21 @@ print("Total bytes:", total_bytes)
 print("Total chunks:", len(chunks))
 print("Touched chunks:", len(touched_chunks))
 
-html_header = '<html><head></head><body style="background: #FDF6E3; color:#333333;"><div style="font-size:18px">'
-html_footer = "</div></body></html>"
-
-html_chunks = ""
+new_chunks = []
 ix = 0
 for chunk in chunks:
-    if ix in touched_chunks:
-        html_chunks += '<pre style="background-color: #F1D49B;display:inline;margin:0">[' + str(ix) + "]\t" + chunk + "\n</pre>"
-    else:
-        html_chunks += '<pre style="display:inline;margin:0">[' + str(ix) + "]\t" + chunk + "\n</pre>"
+    nc = {}
+    nc['marked'] = ix in touched_chunks
+    nc['line'] = chunk
+    new_chunks.append(nc)
     ix += 1
 
-html = html_header + html_chunks + html_footer
+html_chunks = html.html_chunks(new_chunks)
 
-fout = open("./result.html", 'w')
-fout.write(html)
-fout.close()
+stats = ["Total bytes: " + str(total_bytes),
+        "Total chunks: " + str(len(chunks)), 
+        "Touched chunks: " + str(len(touched_chunks))]
+html_stats = html.html_lines(stats)
+
+html.write_html("./result.html", [html_chunks, html_stats])
+

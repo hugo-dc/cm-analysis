@@ -1,7 +1,18 @@
 #!/bin/env python
 from graphviz import Digraph
 
-def generate_tree(tree):
+def get_color(number, indices):
+    print(number)
+    print(indices)
+    print(number in indices)
+    if number in indices:
+        print(number, "red")
+        return "red"
+    print(number, "blue")
+    return "blue"
+
+
+def generate_tree(tree, description):
     dot = Digraph()
     dot.graph_attr['rankdir'] = 'TB'
     dot.format = 'svg'
@@ -13,21 +24,30 @@ def generate_tree(tree):
     code_subtree = []
 
     while iy + 2 < len(tree):
-        node_name = str(tree[ix])
-        left_name = str(tree[iy+1])
-        right_name = str(tree[iy+2])
-
-        print(node_name)
+        node_number = tree[ix]
+        left_number = tree[ix+1]
+        right_number = tree[ix+2]
+        node_name = description[ix]
+        left_name = description[iy+1]
+        right_name = description[iy+2]
 
         if node_name in allowed_nodes or node_name in code_subtree:
-           dot.node(node_name, node_name)
-           dot.node(left_name, left_name)
-           dot.node(right_name, right_name)
+            #fcolor = get_color(node_number, indices)
+            print(ix)
+            print(description[ix])
+            
+            dot.node(str(node_number), node_name) #, fillcolor=fcolor, style="filled")
 
-           dot.edge(node_name, left_name)
-           dot.edge(node_name, right_name)
+            #fcolor = get_color(left_number, indices)
+            dot.node(str(left_number), left_name) #, fillcolor=fcolor, style="filled")
 
-           if node_name == "6" or node_name in code_subtree:
+            #fcolor = get_color(right_number, indices)
+            dot.node(str(right_number), right_name) #, fillcolor=fcolor, style="filled")
+
+            dot.edge(node_name, left_name)
+            dot.edge(node_name, right_name)
+
+            if node_number == 6 or node_name in code_subtree:
                 code_subtree.append(left_name)
                 code_subtree.append(right_name)
 
@@ -58,8 +78,16 @@ print("Indices (" + str(len(indices)) + "):", indices)
 print("Hashes (" + str(len(hashes)) + "):", hashes)
 print("Leaves (" + str(len(leaves)) + "):", leaves)
 
-depth_10 = range(1, 13313)
-tree = generate_tree(depth_10)
-tree.render('tree.dot', view=False)
+depth_10 = range(1, 14337)
+description = list(range(1, 14337))
+description = [str(x) for x in description]
 
+description[6] = "Chunks: " + leaves[0]
+description[7] = "Version: " + leaves[1]
+description[8] = "CodeHash: " + leaves[2]
+description[9] = "CodeLength: " + leaves[3]
+description[10] = "Empty"
+
+tree = generate_tree(depth_10, description)
+tree.render('tree.dot', view=False)
 
